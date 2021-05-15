@@ -1,25 +1,16 @@
 #include "game.h"
 
 void Game::CreateOpponents() {
-  std::unique_ptr<Opponent> opp(100, 100);
-  GetOpponents().push_back(opp);
+  std::unique_ptr<Opponent> opp = std::make_unique<Opponent>(100, 100);
+  GetOpponents().push_back(std::move(opp));
 }
-void Game::CreateOpponentProjectiles() {
-  std::unique_ptr<OpponentProjectile> oProj(100, 160);
-  GetOpponentProjectiles().push_back(oProj);
-}
-void Game::CreatePlayerProjectiles() {
-  std::unique_ptr<PlayerProjectile> pProj(300, 700);
-  GetPlayerProjectiles().push_back(pProj);
-}
+
 void Game::OnAnimationStep() {
-  if(opponents.size() == 0){
+  if (opponents.size() == 0) {
     CreateOpponents();
   }
   MoveGameElements();
-  for(int i = 0; i < oppoents.size(); i++){
-    opponents[i]->LaunchProjectiles();
-  }
+  LaunchProjectiles();
   FilterIntersections();
   RemoveInactive();
   UpdateScreen();
@@ -32,10 +23,12 @@ void Game::Init() {
   gameScreen.AddAnimationEventListener(*this);
 }
 void Game::UpdateScreen() {
-  gameScreen.DrawText(10, 10, "Score: ", 5, graphics::Color(0, 0, 0));
+  std::string score = "Score: " + std::to_string(score_);
+  gameScreen.DrawText(10, 10, score, 5, graphics::Color(0, 0, 0));
   gameScreen.DrawRectangle(0, 0, 800, 600, 255, 255, 255);
-  if(playerStatus == false){
-    gameScreen.DrawText(gameScreen.GetWidth()/2, gameScreen.GetHeight()/2, "GAME OVER", 20, graphics::Color(0, 0, 0));
+  if (playerStatus == true) {
+    gameScreen.DrawText(gameScreen.GetWidth() / 2, gameScreen.GetHeight() / 2,
+                        "GAME OVER", 20, graphics::Color(0, 0, 0));
   }
   for (int i = 0; i < opponents.size(); i++) {
     if (opponents[i]->GetIsActive() == true) {
@@ -84,25 +77,27 @@ void Game::MoveGameElements() {
 
 void Game::FilterIntersections() {
   for (int x = 0; x < opponents.size(); x++) {
-    if (player.IntersectsWith(opponents[x]->Get()) == true) {
+    if (player.IntersectsWith(opponents[x].get()) == true) {
       player.SetIsActive(false);
       opponents[x]->SetIsActive(false);
-      playerStatus = false;
+      playerStatus = true;
     }
   }
   for (int i = 0; i < oProjectiles.size(); i++) {
-    if (player.IntersectsWith(oProjectiles[i]->Get()) == true) {
+    if (player.IntersectsWith(oProjectiles[i].get()) == true) {
       player.SetIsActive(false);
       oProjectiles[i]->SetIsActive(false);
-      playerStatus = false;
+      playerStatus = true;
     }
   }
   for (int y = 0; y < opponents.size(); y++) {
     for (int a = 0; a < pProjectiles.size(); a++) {
-      if (opponents[y]->IntersectsWith(pProjectiles[a]->Get()) == true) {
+      if (opponents[y]->IntersectsWith(pProjectiles[a].get()) == true) {
         opponents[y]->SetIsActive(false);
         pProjectiles[a]->SetIsActive(false);
-        score_++;
+        if (player.GetIsActive() == true) {
+          score_++;
+        }
       }
     }
   }
@@ -122,39 +117,43 @@ void Game::OnMouseEvent(const graphics::MouseEvent &mouseEvent) {
       player.SetY(temp_y);
     }
   }
-  if(mouseEvent.GetMouseAction() == graphics::MouseAction::kPressed){
-    std::make_unique<PlayerProjectile> pProj;
+  if (mouseEvent.GetMouseAction() == graphics::MouseAction::kPressed ||
+      mouseEvent.GetMouseAction() == graphics::MouseAction::kDragged) {
+    std::unique_ptr<PlayerProjectile> pProj =
+        std::make_unique<PlayerProjectile>(player.GetX(), player.GetY());
     pProjectiles.push_back(std::move(pProj));
   }
 }
 
-std::unique_ptr<OpponentProjectile> Game::LaunchProjectiles(){
-  for(int i = 0; i < oppoents.size(); i++){
-    if(opponents[i]->LaunchProjectile() != nullptr){
-      opponents[i] = std::move(push_back(opponents[i]->LaunchProjectile()));
+void Game::LaunchProjectiles() {
+  for (int i = 0; i < opponents.size(); i++) {
+    std::unique_ptr<OpponentProjectile> oProj =
+        std::make_unique<OpponentProjectile>();
+    if (oProj != nullptr) {
+      GetOpponentProjectiles().push_back(std::move(oProj));
     }
   }
 }
 
-void RemoveIncative(){
-  for(int i = opponents.size()-1; i >= 0; i--){
-    if(opponents[i]->GetIsActive() == false){
+void Game::RemoveInactive() {
+  for (int i = opponents.size() - 1; i >= 0; i--) {
+    if (opponents[i]->GetIsActive() == false) {
       opponents.erase(opponents.begin() + i);
-    }else{
+    } else {
       continue;
     }
   }
-  for(int i = oProjectile.size()-1; i >= 0; i--){
-    if(oProjectiles[i]->GetIsActive() == false){
+  for (int i = oProjectiles.size() - 1; i >= 0; i--) {
+    if (oProjectiles[i]->GetIsActive() == false) {
       oProjectiles.erase(oProjectiles.begin() + i);
-    }else{
+    } else {
       continue;
     }
   }
-  for(int i = pProjectiles.size()-1; i >=0; i--){
-    if(pProjectiles[i]->GetIsActive() == false){
+  for (int i = pProjectiles.size() - 1; i >= 0; i--) {
+    if (pProjectiles[i]->GetIsActive() == false) {
       pProjectiles.erase(pProjectiles.begin() + i);
-    }else{
+    } else {
       continue;
     }
   }
