@@ -18,7 +18,7 @@ void Game::OnAnimationStep() {
   }
   MoveGameElements();
   for(int i = 0; i < oppoents.size(); i++){
-    oppoents[i]->LaunchProjectiles();
+    opponents[i]->LaunchProjectiles();
   }
   FilterIntersections();
   RemoveInactive();
@@ -32,10 +32,10 @@ void Game::Init() {
   gameScreen.AddAnimationEventListener(*this);
 }
 void Game::UpdateScreen() {
-  gameScreen.DrawText(10, 10, "Score: ", 5, graphics::Color(0, 0, 0); )
+  gameScreen.DrawText(10, 10, "Score: ", 5, graphics::Color(0, 0, 0));
   gameScreen.DrawRectangle(0, 0, 800, 600, 255, 255, 255);
   if(playerStatus == false){
-    gameScreen.DrawText(gameScreen.GetWidth()/2, gameScreen.GetHeight()/2, "GAME OVER", 20, grpahics::Color(0, 0, 0));
+    gameScreen.DrawText(gameScreen.GetWidth()/2, gameScreen.GetHeight()/2, "GAME OVER", 20, graphics::Color(0, 0, 0));
   }
   for (int i = 0; i < opponents.size(); i++) {
     if (opponents[i]->GetIsActive() == true) {
@@ -84,14 +84,14 @@ void Game::MoveGameElements() {
 
 void Game::FilterIntersections() {
   for (int x = 0; x < opponents.size(); x++) {
-    if (player.IntersectsWith(opponents[x].Get()) == true) {
+    if (player.IntersectsWith(opponents[x]->Get()) == true) {
       player.SetIsActive(false);
       opponents[x]->SetIsActive(false);
       playerStatus = false;
     }
   }
   for (int i = 0; i < oProjectiles.size(); i++) {
-    if (player.IntersectsWith(oProjectiles[i].Get()) == true) {
+    if (player.IntersectsWith(oProjectiles[i]->Get()) == true) {
       player.SetIsActive(false);
       oProjectiles[i]->SetIsActive(false);
       playerStatus = false;
@@ -99,10 +99,10 @@ void Game::FilterIntersections() {
   }
   for (int y = 0; y < opponents.size(); y++) {
     for (int a = 0; a < pProjectiles.size(); a++) {
-      if (opponents[y]->IntersectsWith(pProjectiles[a].Get()) == true) {
+      if (opponents[y]->IntersectsWith(pProjectiles[a]->Get()) == true) {
         opponents[y]->SetIsActive(false);
         pProjectiles[a]->SetIsActive(false);
-        score++;
+        score_++;
       }
     }
   }
@@ -122,7 +122,7 @@ void Game::OnMouseEvent(const graphics::MouseEvent &mouseEvent) {
       player.SetY(temp_y);
     }
   }
-  if(mouseEvent.GetMouseAction() == graphics::MouseAction::kPress){
+  if(mouseEvent.GetMouseAction() == graphics::MouseAction::kPressed){
     std::make_unique<PlayerProjectile> pProj;
     pProjectiles.push_back(std::move(pProj));
   }
