@@ -24,7 +24,7 @@ class Game : public graphics::AnimationEventListener,
   int GetScore(){return score_;}
   bool HasLost(){return playerStatus;}
   std::unique_ptr<OpponentProjectile> LaunchProjectiles();
-  void RemoveIncative();
+  void RemoveInactive();
   void MoveGameElements();
   void FilterIntersections();
   void CreateOpponents();
