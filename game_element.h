@@ -21,7 +21,7 @@ class GameElement {
   bool GetIsActive() const { return is_active; }
   virtual void Draw(graphics::Image& image) = 0;
   virtual void Move(const graphics::Image& image) = 0;
-  bool IntersectsWith(const GameElement& elem);
+  bool IntersectsWith(const GameElement* elem);
   bool IsOutOfBounds(const graphics::Image& img);
 
  protected:
