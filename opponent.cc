@@ -15,7 +15,7 @@ void OpponentProjectile::Move(const graphics::Image& image) {
   }
 }
 
-std::unique_ptr<OpponentProjectile> Opponent::LaunchProjectile(){
+std::unique_ptr<OpponentProjectile> OpponentProjectile::LaunchProjectile(GameElement* object){
   std::unique_ptr<OpponentProjectile> projectile;
   int counter = 0;
   if(counter < 5){
