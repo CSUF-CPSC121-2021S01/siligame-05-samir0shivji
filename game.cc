@@ -24,8 +24,8 @@ void Game::Init() {
 }
 void Game::UpdateScreen() {
   std::string score = "Score: " + std::to_string(score_);
-  gameScreen.DrawText(10, 10, score, 5, graphics::Color(0, 0, 0));
   gameScreen.DrawRectangle(0, 0, 800, 600, 255, 255, 255);
+  gameScreen.DrawText(10, 10, score, 5, graphics::Color(0, 0, 0));
   if (playerStatus == true) {
     gameScreen.DrawText(gameScreen.GetWidth() / 2, gameScreen.GetHeight() / 2,
                         "GAME OVER", 20, graphics::Color(0, 0, 0));
