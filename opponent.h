@@ -7,12 +7,23 @@
 #include "cpputils/graphics/image.h"
 #include "game_element.h"
 
+// Opponent Projectile
+class OpponentProjectile : public GameElement {
+ public:
+  OpponentProjectile(int x, int y) : GameElement(x, y, 5, 5) {}
+  OpponentProjectile() : GameElement(0, 0, 5, 5) {}
+  void Move(const graphics::Image& image) override;
+  void Draw(graphics::Image& Can) override {
+    Can.DrawCircle(2 + x_, 2 + y_, 1, 150, 200, 255);
+  }
+};
+
 class Opponent : public GameElement {
  public:
   Opponent(int x, int y) : GameElement(x, y, 50, 50) {}
   Opponent() : GameElement(0, 0, 50, 50) {}
   void Move(const graphics::Image& Image) override;
-  
+  std::unique_ptr<OpponentProjectile> LaunchProjectile();
   void Draw(graphics::Image& Can) override {
     Can.DrawLine(11 + x_, 20 + y_, 31 + x_, 12 + y_, 0, 0, 0, 1);
     Can.DrawLine(31 + x_, 12 + y_, 36 + x_, 21 + y_, 0, 0, 0, 1);
@@ -32,17 +43,9 @@ class Opponent : public GameElement {
     Can.DrawLine(27 + x_, 29 + y_, 31 + x_, 29 + y_, 0, 0, 0, 1);
     Can.DrawLine(31 + x_, 29 + y_, 33 + x_, 31 + y_, 0, 0, 0, 1);
   }
+
+ private:
+  int counter = 0;
 };
 
-// Opponent Projectile
-class OpponentProjectile : public GameElement {
- public:
-  OpponentProjectile(int x, int y) : GameElement(x, y, 5, 5) {}
-  OpponentProjectile() : GameElement(0, 0, 5, 5) {}
-  void Move(const graphics::Image& image) override;
-  void Draw(graphics::Image& Can) override {
-    Can.DrawCircle(2 + x_, 2 + y_, 1, 150, 200, 255);
-  }
-  std::unique_ptr<OpponentProjectile> LaunchProjectile(GameElement* object);
-};
 #endif
